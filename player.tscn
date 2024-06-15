@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://bs1lpba14kcdo"]
+[gd_scene load_steps=8 format=3 uid="uid://bs1lpba14kcdo"]
 
 [ext_resource type="Texture2D" uid="uid://bdv18cwjay8j7" path="res://Assets/Sprites/playerDamaged.png" id="1_h4xvu"]
+[ext_resource type="Script" path="res://Scripts/Player.cs" id="1_qgb5k"]
 [ext_resource type="Texture2D" uid="uid://bjljrblm3twow" path="res://Assets/Sprites/playerDefault.png" id="2_gr0is"]
 [ext_resource type="Texture2D" uid="uid://c261vkyvj2gyq" path="res://Assets/Sprites/playerLeft.png" id="3_mnnaf"]
 [ext_resource type="Texture2D" uid="uid://dngat5bwjikok" path="res://Assets/Sprites/playerRight.png" id="4_5vs34"]
@@ -41,13 +42,17 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1odef"]
-size = Vector2(80, 80)
+size = Vector2(40, 40)
 
 [node name="Player" type="Area2D"]
+script = ExtResource("1_qgb5k")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_7hn32")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1odef")
+
+[connection signal="body_shape_entered" from="." to="." method="_on_body_shape_entered"]
