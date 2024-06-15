@@ -9,7 +9,7 @@ public partial class Player : Area2D {
 	[Export]
 	public int Speed { get; set; } = 400;
 	private int Health { get; set; } = 300;
-	private float AttackCD { get; set; } = 0.2f;
+	private float AttackCD { get; set; } = 0.05f;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
 	private float attackTimer = 0;
