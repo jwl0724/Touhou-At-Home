@@ -2,16 +2,20 @@ using Godot;
 using System;
 
 public partial class Player : Area2D {
-
+	// VARIABLES SECTION
 	[Export]
 	public int Speed { get; set; } = 400;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
 	private static Vector2 _defaultScale;
 	private Vector2 _velocity = Vector2.Zero;
-	private AnimatedSprite2D sprite;
-	
+	private AnimatedSprite2D _sprite;
+	private CollisionShape2D _hitbox;
 
+	// SIGNALS SECTION
+	[Signal]
+	public delegate void HitEventHandler();
+	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		if (Instance != null) {
@@ -19,9 +23,10 @@ public partial class Player : Area2D {
 		}
 		Instance = this;
 		ScreenSize = GetViewportRect().Size;
-		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 2);
-		sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		_sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		_hitbox = GetNode<CollisionShape2D>("CollisionShape2D");
 		_defaultScale = Scale;
+		InitializePlayer();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -36,17 +41,31 @@ public partial class Player : Area2D {
 		ProcessAnimation();
 	}
 
+	// SIGNAL HANDLERS SECTION
+	private void OnBodyEntered(Node2D body) {
+		Hide();
+		EmitSignal(SignalName.Hit);
+		_hitbox.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+	}
+
+	// METHODS SECTION
+	private void InitializePlayer() {
+		Show();
+		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 2);
+		_hitbox.Disabled = false;
+	}
+
 	private void ProcessAnimation() {
 		// process X
 		if (_velocity.X < 0) {
-			sprite.Animation = "left";
-			if (sprite.Rotation > -0.3f) sprite.Rotate(-0.3f);
+			_sprite.Animation = "left";
+			if (_sprite.Rotation > -0.3f) _sprite.Rotate(-0.3f);
 		} else if (_velocity.X > 0) {
-			sprite.Animation = "right";
-			if (sprite.Rotation < 0.3f) sprite.Rotate(0.3f);
+			_sprite.Animation = "right";
+			if (_sprite.Rotation < 0.3f) _sprite.Rotate(0.3f);
 		} else {
-			sprite.Animation = "default";
-			sprite.Rotation = 0;
+			_sprite.Animation = "default";
+			_sprite.Rotation = 0;
 		}
 
 		// process Y
