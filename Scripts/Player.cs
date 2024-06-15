@@ -3,13 +3,16 @@ using System;
 
 public partial class Player : Area2D {
 	// VARIABLES SECTION
+	[Signal]
+	public delegate void FirePlayerProjectileEventHandler();
+
 	[Export]
 	public int Speed { get; set; } = 400;
 	private int Health { get; set; } = 300;
 	private float AttackCD { get; set; } = 0.2f;
-	private float attackTimer = 0;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
+	private float attackTimer = 0;
 	private static Vector2 defaultScale;
 	private Vector2 velocity = Vector2.Zero;
 	private AnimatedSprite2D sprite;
@@ -47,7 +50,7 @@ public partial class Player : Area2D {
 		if (attackTimer > AttackCD) {
 			// add functionality later
 			attackTimer = 0;
-			GD.Print("Projectile Fired!");
+			EmitSignal(SignalName.FirePlayerProjectile);
 		} else attackTimer += (float) delta;
 	}
 
