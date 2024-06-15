@@ -48,7 +48,7 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uxkht"]
-radius = 38.0132
+radius = 9.0
 
 [node name="Projectile" type="CharacterBody2D"]
 collision_mask = 0
@@ -58,6 +58,7 @@ script = ExtResource("1_2fytd")
 metadata/_edit_group_ = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
 sprite_frames = SubResource("SpriteFrames_2vr8l")
 animation = &"enemyProjectile"
 frame_progress = 0.913131
@@ -66,5 +67,5 @@ frame_progress = 0.913131
 shape = SubResource("CircleShape2D_uxkht")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-position = Vector2(2.98023e-07, 5.96046e-08)
-scale = Vector2(2, 1.9)
+position = Vector2(-7.45058e-07, 2.38419e-07)
+scale = Vector2(1, 1)
