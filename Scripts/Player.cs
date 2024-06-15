@@ -46,6 +46,7 @@ public partial class Player : Area2D {
 		// process projectile firing
 		if (attackTimer > AttackCD) {
 			// add functionality later
+			attackTimer = 0;
 			GD.Print("Projectile Fired!");
 		} else attackTimer += (float) delta;
 	}
