@@ -17,6 +17,8 @@ public partial class Player : Area2D {
 	private Vector2 velocity = Vector2.Zero;
 	private AnimatedSprite2D sprite;
 	private CollisionShape2D hitbox;
+	private const float iframesLength = 1.5f;
+	private float iframeTimer = 0f;
 
 	// SIGNALS SECTION
 	[Signal]
@@ -48,22 +50,27 @@ public partial class Player : Area2D {
 
 		// process projectile firing
 		if (attackTimer > AttackCD) {
-			// add functionality later
 			attackTimer = 0;
 			EmitSignal(SignalName.FirePlayerProjectile);
 		} else attackTimer += (float) delta;
+
+		// handle iframes
+		if (hitbox.Disabled) iframeTimer += (float) delta;
+		else if (iframeTimer > iframesLength) {
+			hitbox.Disabled = false;
+			iframeTimer = 0;
+		}
 	}
 
 	// SIGNAL HANDLERS SECTION
 	private void OnBodyEntered(Node2D body) {
-		Hide();
-		EmitSignal(SignalName.Hit);
+		hitbox.Disabled = true;
 		hitbox.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
 	}
 
 	// METHODS SECTION
 
-	private void InitializePlayer() {
+	public void InitializePlayer() {
 		Show();
 		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 2);
 		hitbox.Disabled = false;
