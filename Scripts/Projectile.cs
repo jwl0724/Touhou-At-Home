@@ -2,31 +2,47 @@ using Godot;
 using System;
 
 public partial class Projectile : CharacterBody2D {
-
-	private int Speed {get; set;} = 300;
-	private float Lifespan {get; set;}
-	private Vector2 Direction {get; set;}
+	public static int projectileCount {get; private set;} = 0;
+	public AnimatedSprite2D Sprite;
+	public int Damage {get; private set;}
+	private float Speed;
+	private float Lifespan;
+	private Vector2 Direction;
+	private float Acceleration;
 	private float lifeTime = 0;
 
+	public void Start(Vector2 direction, float speed, float lifespan, float acceleration, int damage) {
+		// connect exit signal to function
+		GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D")
+		.Connect("screen_exited", Callable.From(() => OnVisibleOnScreenNotifier2DScreenExited()));
+		
+		// set projectile properties
+		projectileCount += 1;
+		Sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+		Direction = direction;
+		Speed = speed;
+		Lifespan = lifespan;
+		Acceleration = acceleration;
+		Damage = damage;
+		Sprite.Play();
+
+		GD.Print(projectileCount);
+	}
+
 	public override void _PhysicsProcess(double delta) {
-		Vector2 velocity = Velocity;
-
-		if (Direction != Vector2.Zero) {
-			velocity.X = Direction.X * Speed;
-		} else {
-			velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-		}
-
+		// handle lifetime
 		if (lifeTime > Lifespan) {
 			QueueFree();
+			projectileCount -= 1;
 		} else lifeTime += (float) delta;
-		
 
-		Velocity = velocity;
-		MoveAndSlide();
+		Velocity = new Vector2(Speed, 0).Rotated(Direction.Angle());
+		KinematicCollision2D collision = MoveAndCollide(Velocity * (float) delta);
+		if (collision != null) QueueFree();
 	}
 
 	private void OnVisibleOnScreenNotifier2DScreenExited() {
 		QueueFree();
+		projectileCount -= 1;
 	}
 }
