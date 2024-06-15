@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3 uid="uid://dywoi37jmbyd0"]
+
+[ext_resource type="Script" path="res://Scripts/Enemy.cs" id="1_gkh0f"]
+[ext_resource type="Texture2D" uid="uid://lp6mkgdvhws4" path="res://Assets/Sprites/enemyDefault.png" id="2_y5y8p"]
+[ext_resource type="Texture2D" uid="uid://bp83hge7ivj7f" path="res://Assets/Sprites/enemyLeft.png" id="3_fbv6h"]
+[ext_resource type="Texture2D" uid="uid://x1bsiow57jpt" path="res://Assets/Sprites/enemyRight.png" id="4_fbunh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wsaer"]
+size = Vector2(40, 40)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_py6md"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_y5y8p")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_fbv6h")
+}],
+"loop": true,
+"name": &"left",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_fbunh")
+}],
+"loop": true,
+"name": &"right",
+"speed": 5.0
+}]
+
+[node name="Enemy" type="RigidBody2D"]
+collision_mask = 0
+gravity_scale = 0.0
+script = ExtResource("1_gkh0f")
+metadata/_edit_group_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_wsaer")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = SubResource("SpriteFrames_py6md")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(9.53674e-07, 9.53674e-07)
+scale = Vector2(2, 2)

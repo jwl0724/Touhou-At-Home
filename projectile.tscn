@@ -1,0 +1,70 @@
+[gd_scene load_steps=12 format=3 uid="uid://ct24uq5kv23oh"]
+
+[ext_resource type="Script" path="res://Scripts/Projectile.cs" id="1_2fytd"]
+[ext_resource type="Texture2D" uid="uid://ddxfexotjecmy" path="res://Assets/Sprites/enemyProjectile1.png" id="2_f63n5"]
+[ext_resource type="Texture2D" uid="uid://c60lxkm65wr7t" path="res://Assets/Sprites/enemyProjectile2.png" id="3_la3uh"]
+[ext_resource type="Texture2D" uid="uid://euo1scarsodr" path="res://Assets/Sprites/enemyProjectile3.png" id="4_je7nv"]
+[ext_resource type="Texture2D" uid="uid://bjpypwv13rlyt" path="res://Assets/Sprites/enemyProjectile4.png" id="5_cb43g"]
+[ext_resource type="Texture2D" uid="uid://dyxec43qr122p" path="res://Assets/Sprites/playerProjectile1.png" id="6_bpcmj"]
+[ext_resource type="Texture2D" uid="uid://dkxxph0tw8276" path="res://Assets/Sprites/playerProjectile2.png" id="7_1vq58"]
+[ext_resource type="Texture2D" uid="uid://3r2lrmnjr1d8" path="res://Assets/Sprites/playerProjectile3.png" id="8_i41eq"]
+[ext_resource type="Texture2D" uid="uid://csu1tfe7l6rmr" path="res://Assets/Sprites/playerProjectile4.png" id="9_gaub6"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2vr8l"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_f63n5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_la3uh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_je7nv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_cb43g")
+}],
+"loop": true,
+"name": &"enemyProjectile",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_bpcmj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_1vq58")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_i41eq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_gaub6")
+}],
+"loop": true,
+"name": &"playerProjectile",
+"speed": 15.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uxkht"]
+radius = 38.0132
+
+[node name="Projectile" type="CharacterBody2D"]
+collision_mask = 0
+motion_mode = 1
+floor_constant_speed = true
+script = ExtResource("1_2fytd")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_2vr8l")
+animation = &"enemyProjectile"
+frame_progress = 0.913131
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_uxkht")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(2.98023e-07, 5.96046e-08)
+scale = Vector2(2, 1.9)
