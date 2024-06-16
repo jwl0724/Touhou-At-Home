@@ -1,3 +1,3 @@
 public enum AttackPattern {
-	CONE, CIRCLE, LINE, MELEE
+	CONE, CIRCLE, LINE
 }
