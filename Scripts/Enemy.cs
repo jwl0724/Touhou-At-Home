@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Threading;
 
 public partial class Enemy : RigidBody2D {
 	
@@ -15,7 +16,7 @@ public partial class Enemy : RigidBody2D {
 	private static Vector2 defaultScale;
 	private AnimatedSprite2D sprite;
 	private CollisionShape2D hitbox;
-	private const float stationaryTime = 5f;
+	private const float stationaryTime = 3f;
 	private float stationaryTimer = 0;
 	private Vector2 leaveVelocity = Vector2.Zero;
 
@@ -23,6 +24,11 @@ public partial class Enemy : RigidBody2D {
 	public override void _Ready() {
 		GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D")
 		.Connect("screen_exited", Callable.From(() => OnVisibleOnScreenNotifier2DScreenExited()));
+		
+		// activate detection of collisions
+		ContactMonitor = true;
+		Connect("body_entered", Callable.From((Projectile body) => OnBodyEntered(body)));
+
 		sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		hitbox = GetNode<CollisionShape2D>("CollisionShape2D");
 		defaultScale = Scale;
@@ -53,6 +59,16 @@ public partial class Enemy : RigidBody2D {
 		}
 	}
 
+	// SIGNAL HANDLERS SECTION
+	private void OnBodyEntered(Projectile projectile) {
+		GD.Print("Hit");
+		Health -= projectile.Damage;
+		if (Health <= 0) {
+			QueueFree();
+			return;
+		}
+	}
+
 	// METHODS SECTION
 	public void SetRandomVelocity() {
 		Vector2 velocity = new((float) GD.RandRange(150f, 250f), 0);
@@ -62,7 +78,7 @@ public partial class Enemy : RigidBody2D {
 
 	private void startMovement(double delta) {
 		if (leaveVelocity.IsZeroApprox()) 
-			leaveVelocity = new((float) GD.RandRange(150f, 250f), (float) GD.RandRange(150f, 250f));
+			leaveVelocity = new((float) GD.RandRange(-150f, 150f), (float) GD.RandRange(-150f, 150f));
 		
 		LinearVelocity = new Vector2(
 			LinearVelocity.X + leaveVelocity.X * 1f * (float) delta, 
