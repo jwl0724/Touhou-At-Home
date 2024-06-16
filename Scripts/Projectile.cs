@@ -25,8 +25,6 @@ public partial class Projectile : CharacterBody2D {
 		Acceleration = acceleration;
 		Damage = damage;
 		Sprite.Play();
-
-		GD.Print(projectileCount);
 	}
 
 	public override void _PhysicsProcess(double delta) {
