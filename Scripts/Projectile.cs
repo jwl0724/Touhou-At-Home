@@ -8,10 +8,9 @@ public partial class Projectile : CharacterBody2D {
 	private float Speed;
 	private float Lifespan;
 	private Vector2 Direction;
-	private float Acceleration;
 	private float lifeTime = 0;
 
-	public void Start(Vector2 direction, float speed, float lifespan, float acceleration, int damage) {
+	public void Start(Vector2 direction, float speed, float lifespan, int damage) {
 		// connect exit signal to function
 		GetNode<VisibleOnScreenNotifier2D>("VisibleOnScreenNotifier2D")
 		.Connect("screen_exited", Callable.From(() => OnVisibleOnScreenNotifier2DScreenExited()));
@@ -22,7 +21,6 @@ public partial class Projectile : CharacterBody2D {
 		Direction = direction;
 		Speed = speed;
 		Lifespan = lifespan;
-		Acceleration = acceleration;
 		Damage = damage;
 		Sprite.Play();
 	}
