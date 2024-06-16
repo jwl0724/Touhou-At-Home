@@ -8,7 +8,7 @@ public partial class Player : Area2D {
 	[Signal]
 	public delegate void PlayerDiedEventHandler();
 	[Export]
-	public int Speed { get; set; } = 400;
+	public int Speed { get; set; } = 250;
 	[Export]
 	public const int DefaultHealth = 300;
 	private int Health { get; set; } = DefaultHealth;
@@ -37,17 +37,12 @@ public partial class Player : Area2D {
 		sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		hitbox = GetNode<CollisionShape2D>("CollisionShape2D");
 		defaultScale = Scale;
+		Connect("body_entered", Callable.From((Node2D body) => OnBodyEntered(body)));
 		InitializePlayer();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
-		// check if player is dead
-		if (Health <= 0) {
-			EmitSignal(SignalName.PlayerDied);
-			return;
-		}
-
 		// process player movement
 		ProcessInput();
 		Position += velocity * (float) delta;
@@ -64,19 +59,33 @@ public partial class Player : Area2D {
 		} else attackTimer += (float) delta;
 
 		// handle iframes
-		if (hitbox.Disabled) iframeTimer += (float) delta;
-		else if (iframeTimer > iframesLength) {
+		if (iframeTimer > iframesLength) {
 			hitbox.Disabled = false;
 			iframeTimer = 0;
 			sprite.Animation = "default";
-		}
+		} else if (hitbox.Disabled) iframeTimer += (float) delta;
 	}
 
 	// SIGNAL HANDLERS SECTION
 	private void OnBodyEntered(Node2D body) {
-		hitbox.Disabled = true;
+		if (body.GetClass() == "CharacterBody2D")  {
+			Projectile projectile = (Projectile) body;
+			// ignore if projectile is player projectile
+			if (projectile.Sprite.Animation == "playerProjectile") return;
+			Health -= projectile.Damage;
+		} else if (body.GetClass() == "RigidBody2D") {
+			Enemy enemy = (Enemy) body;
+			Health -= enemy.Attack;
+		}
+
+		// check if player is dead
+		if (Health <= 0) {
+			EmitSignal(SignalName.PlayerDied);
+			return;
+		}
+
+		// disable hitbox for iFrames
 		hitbox.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
-		sprite.Animation = "damaged";
 	}
 
 	// METHODS SECTION
@@ -91,13 +100,16 @@ public partial class Player : Area2D {
 	private void ProcessAnimation() {
 		// process X
 		if (velocity.X < 0) {
-			sprite.Animation = "left";
+			if (hitbox.Disabled) sprite.Animation = "damaged";
+			else sprite.Animation = "left";
 			if (sprite.Rotation > -0.3f) sprite.Rotate(-0.3f);
 		} else if (velocity.X > 0) {
-			sprite.Animation = "right";
+			if (hitbox.Disabled) sprite.Animation = "damaged";
+			else sprite.Animation = "right";
 			if (sprite.Rotation < 0.3f) sprite.Rotate(0.3f);
 		} else {
-			sprite.Animation = "default";
+			if (hitbox.Disabled) sprite.Animation = "damaged";
+			else sprite.Animation = "default";
 			sprite.Rotation = 0;
 		}
 
