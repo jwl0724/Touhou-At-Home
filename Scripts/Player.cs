@@ -5,10 +5,13 @@ public partial class Player : Area2D {
 	// VARIABLES SECTION
 	[Signal]
 	public delegate void FirePlayerProjectileEventHandler();
-
+	[Signal]
+	public delegate void PlayerDiedEventHandler();
 	[Export]
 	public int Speed { get; set; } = 400;
-	private int Health { get; set; } = 300;
+	[Export]
+	public const int DefaultHealth = 300;
+	private int Health { get; set; } = DefaultHealth;
 	private float AttackCD { get; set; } = 0.05f;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
@@ -39,6 +42,12 @@ public partial class Player : Area2D {
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
+		// check if player is dead
+		if (Health <= 0) {
+			EmitSignal(SignalName.PlayerDied);
+			return;
+		}
+
 		// process player movement
 		ProcessInput();
 		Position += velocity * (float) delta;
@@ -59,6 +68,7 @@ public partial class Player : Area2D {
 		else if (iframeTimer > iframesLength) {
 			hitbox.Disabled = false;
 			iframeTimer = 0;
+			sprite.Animation = "default";
 		}
 	}
 
@@ -66,12 +76,14 @@ public partial class Player : Area2D {
 	private void OnBodyEntered(Node2D body) {
 		hitbox.Disabled = true;
 		hitbox.SetDeferred(CollisionShape2D.PropertyName.Disabled, true);
+		sprite.Animation = "damaged";
 	}
 
 	// METHODS SECTION
 
 	public void InitializePlayer() {
 		Show();
+		Health = DefaultHealth;
 		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 2);
 		hitbox.Disabled = false;
 	}
