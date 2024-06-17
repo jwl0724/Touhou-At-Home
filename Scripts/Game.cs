@@ -7,9 +7,11 @@ public partial class Game : Node {
 	[Export]
 	public PackedScene ProjectileScene {get; set;}
 	public Player Player;
+	public HUD Hud;
 	public PathFollow2D EnemySpawnPoint;
 	public Timer EnemyTimer;
 	public Timer StartTimer;
+	public static bool Paused {get; private set;} = true;
 	private float elapsedTime = 0;
 	private int score = 0;
 	private readonly Random rng = new();
@@ -18,31 +20,36 @@ public partial class Game : Node {
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
 		Player = GetNode<Player>("Player");
+		Hud = GetNode<HUD>("HUD");
 		EnemyTimer = GetNode<Timer>("EnemyTimer");
 		StartTimer = GetNode<Timer>("StartTimer");
 		EnemySpawnPoint = GetNode<PathFollow2D>("EnemyPath/EnemySpawnLocation");
 		
 		// connect signals
+		Hud.Connect("StartGame", Callable.From(() => StartGame()));
 		Player.Connect("FirePlayerProjectile", Callable.From(() => OnFirePlayerProjectile()));
 		Player.Connect("PlayerDied", Callable.From(() => OnPlayerDied()));
 		EnemyTimer.Connect("timeout", Callable.From(() => OnEnemyTimeout()));
 		StartTimer.Connect("timeout", Callable.From(() => OnStartTimeout()));
+
+		Hud.ShowMainMenu();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
 		elapsedTime += (float) delta;
+		Hud.UpdateTime((int) elapsedTime);
 	}
 
 	// SIGNAL HANDLERS
 	private void OnEnemyKilled() {
 		const int baseScore = 10;
 		score += CalculateStat(baseScore, 10);
+		Hud.UpdateScore(score);
 		GD.Print(score);
 	}
 
 	private void OnPlayerDied() {
-		GD.Print("player died");
+		StopGame();
 	}
 
 	private void OnStartTimeout() {
@@ -125,16 +132,32 @@ public partial class Game : Node {
 
 	// METHODS SECTION
 	private void StopGame() {
+		Paused = true;
 		EnemyTimer.Stop();
 		StartTimer.Stop();
+		Hud.ShowGameOver();
+
+		// stop scrolling background
+	 	(GetNode<TextureRect>("Background").Material as ShaderMaterial).SetShaderParameter("stop", true);
 	}
 
 	public void StartGame() {
-		EnemyTimer.Stop();
-		StartTimer.Stop();
+		// clear objects from previous session
+		SceneTree tree = GetTree();
+		tree.CallGroup("Enemies", Node.MethodName.QueueFree);
+		tree.CallGroup("Projectiles", Node.MethodName.QueueFree);
+
+		StartTimer.Start();
 		elapsedTime = 0;
 		score = 0;
 		Player.InitializePlayer();
+		Hud.UpdateTime((int) elapsedTime);
+		Hud.UpdateScore(score);
+		Hud.ShowGameUI();
+		Paused = false;
+
+		// start scrolling background
+		(GetNode<TextureRect>("Background").Material as ShaderMaterial).SetShaderParameter("stop", false);
 	}
 
 	private void RandomizeEnemyProperties(Enemy enemy) {
