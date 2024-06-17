@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Threading;
 
 public partial class Enemy : RigidBody2D {
 	
@@ -26,8 +25,8 @@ public partial class Enemy : RigidBody2D {
 		.Connect("screen_exited", Callable.From(() => OnVisibleOnScreenNotifier2DScreenExited()));
 		
 		// activate detection of collisions
-		ContactMonitor = true;
-		Connect("body_entered", Callable.From((Projectile body) => OnBodyEntered(body)));
+		GetNode<Area2D>("Hitbox")
+		.Connect("body_entered", Callable.From((Node2D body) => OnBodyEntered(body)));
 
 		sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 		hitbox = GetNode<CollisionShape2D>("CollisionShape2D");
@@ -41,7 +40,7 @@ public partial class Enemy : RigidBody2D {
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta) {
+	public override void _PhysicsProcess(double delta) {
 		ProcessAnimation();
 
 		// handle enemy attack
@@ -60,8 +59,13 @@ public partial class Enemy : RigidBody2D {
 	}
 
 	// SIGNAL HANDLERS SECTION
-	private void OnBodyEntered(Projectile projectile) {
-		GD.Print("Hit");
+	private void OnBodyEntered(Node2D body) {
+		// filter out collisions that aren't player bullets
+		if (body.GetClass() == "RigidBody2D" || body.GetClass() == "Area2D") return;
+		Projectile projectile = (Projectile) body;
+		if (projectile.Sprite.Animation == "enemyProjectile") return;
+
+		// handle getting hit
 		Health -= projectile.Damage;
 		if (Health <= 0) {
 			QueueFree();
