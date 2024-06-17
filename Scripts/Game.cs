@@ -65,7 +65,7 @@ public partial class Game : Node {
 		int damage = enemy.Attack;
 		int projectileCount;
 		if (enemy.AttackPattern == AttackPattern.LINE) projectileCount = 1;
-		else if (enemy.AttackPattern == AttackPattern.CONE) projectileCount = 5;
+		else if (enemy.AttackPattern == AttackPattern.CONE) projectileCount = 3;
 		else projectileCount = 8; // set projectile count for circle 
 
 		for (int i = 0; i < projectileCount; i++) {
@@ -79,7 +79,7 @@ public partial class Game : Node {
 				float direction = (float) Math.PI / 2;
 				projectile.SetProperties(direction, projectileSpeed, projectileLifespan, damage);
 			} else if (enemy.AttackPattern == AttackPattern.CONE) {
-				float direction = (float) Math.PI / 6 * i;
+				float direction = (float) Math.PI * (2 + i) / 6;
 				projectile.SetProperties(direction, projectileSpeed, projectileLifespan, damage);
 			} else if (enemy.AttackPattern == AttackPattern.CIRCLE) {
 				float direction = (float) Math.PI / 4 * i;
@@ -90,17 +90,22 @@ public partial class Game : Node {
 	}
 
 	private void OnFirePlayerProjectile() {
-		Projectile projectile = ProjectileScene.Instantiate<Projectile>();
-		projectile.AssignSprite();
-		const int damage = 10;
-		const float projectileLifespan = 3f;
-		const float direction = (float) Math.PI / 2;
-		float projectileSpeed = Player.Speed * -2;
+		const int projectileCount = 3;
+		for (int i = 0; i < projectileCount; i++) {
+			Projectile projectile = ProjectileScene.Instantiate<Projectile>();
+			projectile.AssignSprite();
+			const int damage = 20;
+			const float projectileLifespan = 3f;
+			float direction = (float) Math.PI * (11 + i) / 24;
+			float projectileSpeed = Player.Speed * -2;
 
-		projectile.SetProperties(direction, projectileSpeed, projectileLifespan, damage);
-		projectile.Position = Player.Position;
-		projectile.Sprite.Animation = "playerProjectile";
-		AddChild(projectile);
+			projectile.SetProperties(direction, projectileSpeed, projectileLifespan, damage);
+			projectile.Position = Player.Position;
+			projectile.Sprite.Animation = "playerProjectile";
+			projectile.Rotation = projectile.Velocity.Angle();
+			AddChild(projectile);
+		}
+
 	}
 
 	// METHODS SECTION
@@ -117,7 +122,7 @@ public partial class Game : Node {
 		int attackPatternCount = Enum.GetValues<AttackPattern>().Length;
 		AttackPattern attackPattern = Enum.GetValues<AttackPattern>()[rng.Next(attackPatternCount)];
 		
-		enemy.AttackCD = (float) GD.RandRange(0.5f, 2f);
+		enemy.AttackCD = (float) GD.RandRange(0.75f, 2.5f);
 		enemy.AttackPattern = attackPattern;
 		enemy.Health = CalculateStat(baseHealth, maxFactor);
 		enemy.Attack = CalculateStat(baseAttack, maxFactor);
