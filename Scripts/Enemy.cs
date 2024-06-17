@@ -41,10 +41,6 @@ public partial class Enemy : RigidBody2D {
 		QueueFree();
 	}
 
-    public override void _Process(double delta) {
-        if (Game.Paused == true) return;
-    }
-
     public override void _PhysicsProcess(double delta) {
 		if (Game.Paused == true) {
 			// stop moving when game is paused
