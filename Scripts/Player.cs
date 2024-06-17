@@ -79,6 +79,9 @@ public partial class Player : Area2D {
 			Enemy enemy = (Enemy) body;
 			Health -= enemy.Attack;
 		}
+		
+		// send signal that player got hit to game loop
+		EmitSignal(SignalName.Hit);
 
 		// check if player is dead
 		if (Health <= 0) {
