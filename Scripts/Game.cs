@@ -17,14 +17,35 @@ public partial class Game : Node {
 	private readonly Random rng = new();
 	private const int maxEnemyCount = 100;
 
+	// MUSIC AND SFX
+	private AudioStreamPlayer mainMenuMusic;
+	private AudioStreamPlayer gameOverMusic;
+	private AudioStreamPlayer inGameMusic;
+	private AudioStreamPlayer enemyKilledSFX;
+	private AudioStreamPlayer enemyShootSFX;
+	private AudioStreamPlayer gameOverSFX;
+	private AudioStreamPlayer playerDamagedSFX;
+	private AudioStreamPlayer playerShootSFX;
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready() {
+		// assign node variables
 		Player = GetNode<Player>("Player");
 		Hud = GetNode<HUD>("HUD");
 		EnemyTimer = GetNode<Timer>("EnemyTimer");
 		StartTimer = GetNode<Timer>("StartTimer");
 		EnemySpawnPoint = GetNode<PathFollow2D>("EnemyPath/EnemySpawnLocation");
 		
+		// assign sound effects variables
+		mainMenuMusic = GetNode<AudioStreamPlayer>("Music/mainMenuMusic");
+		gameOverMusic = GetNode<AudioStreamPlayer>("Music/gameOverMusic");
+		inGameMusic = GetNode<AudioStreamPlayer>("Music/inGameMusic");
+		enemyKilledSFX = GetNode<AudioStreamPlayer>("SFX/enemyKilledSFX");
+		enemyShootSFX = GetNode<AudioStreamPlayer>("SFX/enemyShootSFX");
+		gameOverSFX = GetNode<AudioStreamPlayer>("SFX/gameOverSFX");
+		playerDamagedSFX = GetNode<AudioStreamPlayer>("SFX/playerDamagedSFX");
+		playerShootSFX = GetNode<AudioStreamPlayer>("SFX/playerShootSFX");
+
 		// connect signals
 		Hud.Connect("StartGame", Callable.From(() => StartGame()));
 		Player.Connect("FirePlayerProjectile", Callable.From(() => OnFirePlayerProjectile()));
@@ -32,7 +53,9 @@ public partial class Game : Node {
 		Player.Connect("Hit", Callable.From(() => OnPlayerHit()));
 		EnemyTimer.Connect("timeout", Callable.From(() => OnEnemyTimeout()));
 		StartTimer.Connect("timeout", Callable.From(() => OnStartTimeout()));
+		gameOverSFX.Connect("finished", Callable.From(() => OnGameOverSFXFinished()));
 
+		mainMenuMusic.Play();
 		Hud.ShowMainMenu();
 	}
 
@@ -42,17 +65,24 @@ public partial class Game : Node {
 	}
 
 	// SIGNAL HANDLERS
+	private void OnGameOverSFXFinished() {
+		if (Paused) gameOverMusic.Play();
+	}
+
 	private void OnEnemyKilled() {
 		const int baseScore = 10;
 		score += CalculateStat(baseScore, 10);
 		Hud.UpdateScore(score);
+		enemyKilledSFX.Play();
 	}
 
 	private void OnPlayerHit() {
 		Hud.UpdateHealthBar(Player);
+		playerDamagedSFX.Play();
 	}
 
 	private void OnPlayerDied() {
+		gameOverSFX.Play();
 		StopGame();
 	}
 
@@ -61,6 +91,7 @@ public partial class Game : Node {
 	}
 
 	private void OnEnemyTimeout() {
+		if (Paused) return;
 		if (Enemy.EnemyCount >= maxEnemyCount) return;
 		int spawnCount = rng.Next(CalculateStat(5, 5)) + 1;
 		for (int i = 0; i < spawnCount; i++) {
@@ -83,6 +114,7 @@ public partial class Game : Node {
 	}
 
 	private void OnFireEnemyProjectile(Enemy enemy) {
+		if (Paused) return;
 		if (Projectile.ProjectileCount >= 600) return;
 
 		// set projectile variables for enemy
@@ -113,9 +145,12 @@ public partial class Game : Node {
 			}
 			AddChild(projectile);
 		}
+		
+		enemyShootSFX.Play();
 	}
 
 	private void OnFirePlayerProjectile() {
+		if (Paused) return;
 		const int projectileCount = 3;
 		for (int i = 0; i < projectileCount; i++) {
 			Projectile projectile = ProjectileScene.Instantiate<Projectile>();
@@ -132,6 +167,7 @@ public partial class Game : Node {
 			AddChild(projectile);
 		}
 
+		playerShootSFX.Play();
 	}
 
 	// METHODS SECTION
@@ -141,17 +177,25 @@ public partial class Game : Node {
 		StartTimer.Stop();
 		Hud.ShowGameOver();
 
+		mainMenuMusic.Stop();
+		inGameMusic.Stop();
+
 		// stop scrolling background
 	 	(GetNode<TextureRect>("Background").Material as ShaderMaterial).SetShaderParameter("stop", true);
 	}
 
 	public void StartGame() {
+
 		// clear objects from previous session
 		SceneTree tree = GetTree();
 		tree.CallGroup("Enemies", Node.MethodName.QueueFree);
 		tree.CallGroup("Projectiles", Node.MethodName.QueueFree);
 
-		StartTimer.Start();
+		mainMenuMusic.Stop();
+		gameOverMusic.Stop();
+		gameOverSFX.Stop();
+		inGameMusic.Play();
+
 		elapsedTime = 0;
 		score = 0;
 		Player.InitializePlayer();
@@ -159,6 +203,7 @@ public partial class Game : Node {
 		Hud.UpdateTime((int) elapsedTime);
 		Hud.UpdateScore(score);
 		Hud.ShowGameUI();
+		StartTimer.Start();
 		Paused = false;
 
 		// start scrolling background
