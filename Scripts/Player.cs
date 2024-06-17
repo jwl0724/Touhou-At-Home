@@ -11,7 +11,7 @@ public partial class Player : Area2D {
 	public int Speed { get; set; } = 250;
 	[Export]
 	public const int DefaultHealth = 300;
-	private int Health { get; set; } = DefaultHealth;
+	public int Health { get; private set; } = DefaultHealth;
 	private float AttackCD { get; set; } = 0.1f;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
