@@ -1,16 +1,30 @@
-[gd_scene load_steps=8 format=3 uid="uid://dtqmhf14lyfm3"]
+[gd_scene load_steps=19 format=3 uid="uid://dtqmhf14lyfm3"]
 
 [ext_resource type="Script" path="res://Scripts/Game.cs" id="1_cqctn"]
 [ext_resource type="PackedScene" uid="uid://dywoi37jmbyd0" path="res://enemy.tscn" id="2_06g7w"]
 [ext_resource type="PackedScene" uid="uid://ct24uq5kv23oh" path="res://projectile.tscn" id="3_5tiyy"]
 [ext_resource type="PackedScene" uid="uid://bs1lpba14kcdo" path="res://player.tscn" id="4_h5hy3"]
 [ext_resource type="Texture2D" uid="uid://de4dj2k3yjtqq" path="res://Assets/Sprites/background.png" id="5_upinb"]
+[ext_resource type="Shader" path="res://Assets/Scroll.gdshader" id="5_yya2f"]
+[ext_resource type="PackedScene" uid="uid://dcwarwo17via3" path="res://hud.tscn" id="7_fllsf"]
+[ext_resource type="AudioStream" uid="uid://dcruopuedq6ar" path="res://Assets/Music/menuMusic.mp3" id="8_54y7h"]
+[ext_resource type="AudioStream" uid="uid://f01al5pxusxq" path="res://Assets/SFX/enemyKilledSFX.wav" id="9_lhqvb"]
+[ext_resource type="AudioStream" uid="uid://v4s54rod5qbw" path="res://Assets/SFX/enemyShootSFX.mp3" id="10_ksg2y"]
+[ext_resource type="AudioStream" uid="uid://ch0535x02k0lb" path="res://Assets/SFX/gameOverSFX.mp3" id="11_wni6t"]
+[ext_resource type="AudioStream" uid="uid://cg8eiw2b24vqd" path="res://Assets/SFX/playerDamagedSFX.mp3" id="12_pkof6"]
+[ext_resource type="AudioStream" uid="uid://dqo0ih4eq5dhn" path="res://Assets/SFX/playerShootSFX.mp3" id="13_yde1b"]
+[ext_resource type="AudioStream" uid="uid://bgxyrm813f1cb" path="res://Assets/Music/gameOverMusic.mp3" id="14_tmf5d"]
+[ext_resource type="AudioStream" uid="uid://ckf8hwswg1uun" path="res://Assets/Music/inGameMusic.mp3" id="15_5swed"]
 
 [sub_resource type="Environment" id="Environment_itxga"]
 background_mode = 3
 glow_enabled = true
 glow_blend_mode = 1
 glow_hdr_threshold = 0.34
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_smfop"]
+shader = ExtResource("5_yya2f")
+shader_parameter/stop = null
 
 [sub_resource type="Curve2D" id="Curve2D_3r6v0"]
 _data = {
@@ -26,8 +40,11 @@ ProjectileScene = ExtResource("3_5tiyy")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_itxga")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(1.25, 0.75, 1.25, 1)
 z_as_relative = false
+texture_repeat = 2
+material = SubResource("ShaderMaterial_smfop")
 offset_right = 500.0
 offset_bottom = 904.0
 texture = ExtResource("5_upinb")
@@ -37,12 +54,10 @@ modulate = Color(2, 2, 2, 1)
 position = Vector2(260, 395)
 
 [node name="EnemyTimer" type="Timer" parent="."]
-wait_time = 0.5
+wait_time = 1.5
 
 [node name="StartTimer" type="Timer" parent="."]
-wait_time = 2.0
 one_shot = true
-autostart = true
 
 [node name="EnemyPath" type="Path2D" parent="."]
 curve = SubResource("Curve2D_3r6v0")
@@ -50,3 +65,37 @@ curve = SubResource("Curve2D_3r6v0")
 [node name="EnemySpawnLocation" type="PathFollow2D" parent="EnemyPath"]
 position = Vector2(-1, 382)
 rotation = -1.5708
+
+[node name="HUD" parent="." instance=ExtResource("7_fllsf")]
+
+[node name="SFX" type="Node" parent="."]
+
+[node name="enemyKilledSFX" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("9_lhqvb")
+volume_db = 2.0
+
+[node name="enemyShootSFX" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("10_ksg2y")
+volume_db = -5.0
+
+[node name="gameOverSFX" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("11_wni6t")
+
+[node name="playerDamagedSFX" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("12_pkof6")
+volume_db = 5.0
+
+[node name="playerShootSFX" type="AudioStreamPlayer" parent="SFX"]
+stream = ExtResource("13_yde1b")
+volume_db = -10.0
+
+[node name="Music" type="Node" parent="."]
+
+[node name="mainMenuMusic" type="AudioStreamPlayer" parent="Music"]
+stream = ExtResource("8_54y7h")
+
+[node name="gameOverMusic" type="AudioStreamPlayer" parent="Music"]
+stream = ExtResource("14_tmf5d")
+
+[node name="inGameMusic" type="AudioStreamPlayer" parent="Music"]
+stream = ExtResource("15_5swed")
