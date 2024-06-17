@@ -12,7 +12,7 @@ public partial class Player : Area2D {
 	[Export]
 	public const int DefaultHealth = 300;
 	private int Health { get; set; } = DefaultHealth;
-	private float AttackCD { get; set; } = 0.05f;
+	private float AttackCD { get; set; } = 0.1f;
 	public Vector2 ScreenSize;
 	public static Player Instance { get; private set; }
 	private float attackTimer = 0;
