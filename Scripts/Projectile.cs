@@ -37,8 +37,7 @@ public partial class Projectile : CharacterBody2D {
 		} else lifeTime += (float) delta;
 
 		Velocity = new Vector2(Speed, 0).Rotated(Angle);
-		KinematicCollision2D collision = MoveAndCollide(Velocity * (float) delta);
-		if (collision != null) QueueFree();
+		MoveAndSlide();
 	}
 
 	private void OnVisibleOnScreenNotifier2DScreenExited() {
