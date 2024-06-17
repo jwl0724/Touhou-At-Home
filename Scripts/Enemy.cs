@@ -80,6 +80,7 @@ public partial class Enemy : RigidBody2D {
 		// handle getting hit
 		Health -= projectile.Damage;
 		if (Health <= 0) {
+			EnemyCount -= 1;
 			QueueFree();
 			EmitSignal(SignalName.EnemyKilled);
 			return;
