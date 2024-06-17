@@ -30,6 +30,11 @@ public partial class Projectile : CharacterBody2D {
 	}
 
 	public override void _PhysicsProcess(double delta) {
+		if (Game.Paused) {
+			Sprite.Stop();
+			return;
+		}
+
 		// handle lifetime
 		if (lifeTime > Lifespan) {
 			QueueFree();
