@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dywoi37jmbyd0"]
+[gd_scene load_steps=8 format=3 uid="uid://dywoi37jmbyd0"]
 
 [ext_resource type="Script" path="res://Scripts/Enemy.cs" id="1_gkh0f"]
 [ext_resource type="Texture2D" uid="uid://lp6mkgdvhws4" path="res://Assets/Sprites/enemyDefault.png" id="2_y5y8p"]
@@ -35,7 +35,11 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="Enemy" type="RigidBody2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pbc3n"]
+size = Vector2(40, 40)
+
+[node name="Enemy" type="RigidBody2D" groups=["Enemies"]]
+modulate = Color(1.5, 1.5, 1.5, 1)
 collision_mask = 0
 gravity_scale = 0.0
 script = ExtResource("1_gkh0f")
@@ -51,3 +55,9 @@ sprite_frames = SubResource("SpriteFrames_py6md")
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 position = Vector2(9.53674e-07, 9.53674e-07)
 scale = Vector2(2, 2)
+
+[node name="Hitbox" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("RectangleShape2D_pbc3n")
