@@ -9,18 +9,19 @@ public partial class HUD : CanvasLayer {
 	private Label scoreLabel;
 	private Label timerLabel;
 	private Button button;
+	private ProgressBar healthBar;
 
 	public override void _Ready() {
 		messageLabel = GetNode<Label>("MessageLabel");
 		scoreLabel = GetNode<Label>("ScoreLabel");
-		timerLabel = GetNode<Label>("TimerLabel");
+		timerLabel = GetNode<Label>("TimeLabel");
 		button = GetNode<Button>("Button");
+		healthBar = GetNode<ProgressBar>("HealthBar");
+		healthBar.MaxValue = Player.DefaultHealth;
+		
+		// connect signals
 		button.Connect("pressed", Callable.From(() => OnButtonPressed()));
 		ShowMainMenu();
-	}
-
-	public override void _Process(double delta) {
-
 	}
 
 	// SIGNAL HANDLER SECTION
@@ -29,8 +30,12 @@ public partial class HUD : CanvasLayer {
 	}
 
 	// METHODS SECTION
+	public void UpdateHealthBar(Player player) {
+		healthBar.Value = player.Health;
+	}
+
 	public void UpdateScore(int score) {
-		scoreLabel.Text = score.ToString();
+		scoreLabel.Text = $"Score:{score}";
 	}
 
 	public void UpdateTime(int time) {
@@ -42,6 +47,7 @@ public partial class HUD : CanvasLayer {
 	public void ShowMainMenu() {
 		scoreLabel.Hide();
 		timerLabel.Hide();
+		healthBar.Hide();
 		messageLabel.Text = "Touhou At Home";
 		messageLabel.Show();
 		button.Text = "Start";
@@ -51,6 +57,7 @@ public partial class HUD : CanvasLayer {
 	public void ShowGameUI() {
 		scoreLabel.Show();
 		timerLabel.Show();
+		healthBar.Show();
 		messageLabel.Hide();
 		button.Hide();
 	}
@@ -58,7 +65,8 @@ public partial class HUD : CanvasLayer {
 	public void ShowGameOver() {
 		scoreLabel.Hide();
 		timerLabel.Hide();
-		messageLabel.Text = $"Game Over\nTime:{timerLabel.Text}\n{scoreLabel.Text}";
+		healthBar.Hide();
+		messageLabel.Text = $"Game Over\n\nTime:{timerLabel.Text}\n{scoreLabel.Text}";
 		messageLabel.Show();
 		button.Text = "Retry";
 		button.Show();
