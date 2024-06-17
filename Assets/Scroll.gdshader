@@ -1,5 +1,9 @@
 shader_type canvas_item;
 
+uniform bool stop;
+
 void vertex() {
-	UV.y -= TIME;
+	if (!stop) {
+		UV.y -= TIME;
+	}
 }
