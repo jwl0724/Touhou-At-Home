@@ -30,7 +30,9 @@ public partial class Projectile : CharacterBody2D {
 	}
 
 	public override void _PhysicsProcess(double delta) {
+		// handle when game has ended
 		if (Game.Paused) {
+			ProjectileCount = 0;
 			Sprite.Stop();
 			return;
 		}
