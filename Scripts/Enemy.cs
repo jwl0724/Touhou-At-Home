@@ -6,6 +6,8 @@ public partial class Enemy : RigidBody2D {
 	// VARIABLES SECTION
 	[Signal]
 	public delegate void FireEnemyProjectileEventHandler();
+	[Signal]
+	public delegate void EnemyKilledEventHandler();
 	public static int EnemyCount {get; private set;} = 0;
 	public int Health {get; set;}
 	public float AttackCD {get; set;}
@@ -69,6 +71,7 @@ public partial class Enemy : RigidBody2D {
 		Health -= projectile.Damage;
 		if (Health <= 0) {
 			QueueFree();
+			EmitSignal(SignalName.EnemyKilled);
 			return;
 		}
 	}
