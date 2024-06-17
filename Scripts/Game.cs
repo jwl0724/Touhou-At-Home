@@ -29,6 +29,7 @@ public partial class Game : Node {
 		Hud.Connect("StartGame", Callable.From(() => StartGame()));
 		Player.Connect("FirePlayerProjectile", Callable.From(() => OnFirePlayerProjectile()));
 		Player.Connect("PlayerDied", Callable.From(() => OnPlayerDied()));
+		Player.Connect("Hit", Callable.From(() => OnPlayerHit()));
 		EnemyTimer.Connect("timeout", Callable.From(() => OnEnemyTimeout()));
 		StartTimer.Connect("timeout", Callable.From(() => OnStartTimeout()));
 
@@ -45,7 +46,10 @@ public partial class Game : Node {
 		const int baseScore = 10;
 		score += CalculateStat(baseScore, 10);
 		Hud.UpdateScore(score);
-		GD.Print(score);
+	}
+
+	private void OnPlayerHit() {
+		Hud.UpdateHealthBar(Player);
 	}
 
 	private void OnPlayerDied() {
@@ -151,6 +155,7 @@ public partial class Game : Node {
 		elapsedTime = 0;
 		score = 0;
 		Player.InitializePlayer();
+		Hud.UpdateHealthBar(Player);
 		Hud.UpdateTime((int) elapsedTime);
 		Hud.UpdateScore(score);
 		Hud.ShowGameUI();
