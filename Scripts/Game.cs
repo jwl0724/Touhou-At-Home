@@ -11,6 +11,7 @@ public partial class Game : Node {
 	public Timer EnemyTimer;
 	public Timer StartTimer;
 	private float elapsedTime = 0;
+	private int score = 0;
 	private readonly Random rng = new();
 	private const int maxEnemyCount = 100;
 
@@ -20,7 +21,10 @@ public partial class Game : Node {
 		EnemyTimer = GetNode<Timer>("EnemyTimer");
 		StartTimer = GetNode<Timer>("StartTimer");
 		EnemySpawnPoint = GetNode<PathFollow2D>("EnemyPath/EnemySpawnLocation");
+		
+		// connect signals
 		Player.Connect("FirePlayerProjectile", Callable.From(() => OnFirePlayerProjectile()));
+		Player.Connect("PlayerDied", Callable.From(() => OnPlayerDied()));
 		EnemyTimer.Connect("timeout", Callable.From(() => OnEnemyTimeout()));
 		StartTimer.Connect("timeout", Callable.From(() => OnStartTimeout()));
 	}
@@ -31,6 +35,16 @@ public partial class Game : Node {
 	}
 
 	// SIGNAL HANDLERS
+	private void OnEnemyKilled() {
+		const int baseScore = 10;
+		score += CalculateStat(baseScore, 10);
+		GD.Print(score);
+	}
+
+	private void OnPlayerDied() {
+		GD.Print("player died");
+	}
+
 	private void OnStartTimeout() {
 		EnemyTimer.Start();
 	}
@@ -51,8 +65,9 @@ public partial class Game : Node {
 			enemy.SetRandomVelocity();
 			AddChild(enemy);
 
-			// connect signal
+			// connect signals
 			enemy.Connect("FireEnemyProjectile", Callable.From(() => OnFireEnemyProjectile(enemy)));
+			enemy.Connect("EnemyKilled", Callable.From(() => OnEnemyKilled()));
 		}
 	}
 
@@ -109,9 +124,16 @@ public partial class Game : Node {
 	}
 
 	// METHODS SECTION
+	private void StopGame() {
+		EnemyTimer.Stop();
+		StartTimer.Stop();
+	}
 
 	public void StartGame() {
+		EnemyTimer.Stop();
+		StartTimer.Stop();
 		elapsedTime = 0;
+		score = 0;
 		Player.InitializePlayer();
 	}
 
