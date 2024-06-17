@@ -41,8 +41,17 @@ public partial class Enemy : RigidBody2D {
 		QueueFree();
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _PhysicsProcess(double delta) {
+    public override void _Process(double delta) {
+        if (Game.Paused == true) return;
+    }
+
+    public override void _PhysicsProcess(double delta) {
+		if (Game.Paused == true) {
+			// stop moving when game is paused
+			SetDeferred(RigidBody2D.PropertyName.Sleeping, true);
+			return;
+		}
+
 		ProcessAnimation();
 
 		// handle enemy attack
@@ -52,16 +61,17 @@ public partial class Enemy : RigidBody2D {
 		} else attackTimer += (float) delta;
 
 		if (stationaryTimer > stationaryTime) {
-			startMovement(delta);
+			StartMovement(delta);
 		} else if (LinearVelocity.IsZeroApprox()) {
 			stationaryTimer += (float) delta;
 		} else {
-			stopMovement(delta);
+			StopMovement(delta);
 		}
 	}
 
 	// SIGNAL HANDLERS SECTION
 	private void OnBodyEntered(Node2D body) {
+		if (Game.Paused == true) return;
 		// filter out collisions that aren't player bullets
 		if (body.GetClass() == "RigidBody2D" || body.GetClass() == "Area2D") return;
 		Projectile projectile = (Projectile) body;
@@ -83,7 +93,7 @@ public partial class Enemy : RigidBody2D {
 		LinearVelocity = velocity.Rotated(angle);
 	}
 
-	private void startMovement(double delta) {
+	private void StartMovement(double delta) {
 		if (leaveVelocity.IsZeroApprox()) 
 			leaveVelocity = new((float) GD.RandRange(-150f, 150f), (float) GD.RandRange(-150f, 150f));
 		
@@ -93,7 +103,7 @@ public partial class Enemy : RigidBody2D {
 		);
 	}
 
-	private void stopMovement(double delta) {
+	private void StopMovement(double delta) {
 		// slows down enemy till it stops
 		float newVelocityX, newVelocityY, decceleration = 75f * (float) delta;
 
