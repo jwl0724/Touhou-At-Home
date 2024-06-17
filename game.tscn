@@ -93,6 +93,7 @@ volume_db = -10.0
 
 [node name="mainMenuMusic" type="AudioStreamPlayer" parent="Music"]
 stream = ExtResource("8_54y7h")
+volume_db = -10.0
 
 [node name="gameOverMusic" type="AudioStreamPlayer" parent="Music"]
 stream = ExtResource("14_tmf5d")
