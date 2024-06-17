@@ -8,6 +8,7 @@ public partial class HUD : CanvasLayer {
 	private Label messageLabel;
 	private Label scoreLabel;
 	private Label timerLabel;
+	private ColorRect backgroundTint;
 	private Button button;
 	private ProgressBar healthBar;
 
@@ -17,6 +18,7 @@ public partial class HUD : CanvasLayer {
 		timerLabel = GetNode<Label>("TimeLabel");
 		button = GetNode<Button>("Button");
 		healthBar = GetNode<ProgressBar>("HealthBar");
+		backgroundTint = GetNode<ColorRect>("BackgroundTint");
 		healthBar.MaxValue = Player.DefaultHealth;
 		
 		// connect signals
@@ -48,6 +50,7 @@ public partial class HUD : CanvasLayer {
 		scoreLabel.Hide();
 		timerLabel.Hide();
 		healthBar.Hide();
+		backgroundTint.Hide();
 		messageLabel.Text = "Touhou At Home";
 		messageLabel.Show();
 		button.Text = "Start";
@@ -58,6 +61,7 @@ public partial class HUD : CanvasLayer {
 		scoreLabel.Show();
 		timerLabel.Show();
 		healthBar.Show();
+		backgroundTint.Hide();
 		messageLabel.Hide();
 		button.Hide();
 	}
@@ -66,7 +70,8 @@ public partial class HUD : CanvasLayer {
 		scoreLabel.Hide();
 		timerLabel.Hide();
 		healthBar.Hide();
-		messageLabel.Text = $"Game Over\n\nTime:{timerLabel.Text}\n{scoreLabel.Text}";
+		backgroundTint.Show();
+		messageLabel.Text = $"Time:{timerLabel.Text}\n{scoreLabel.Text}\n\nGame Over";
 		messageLabel.Show();
 		button.Text = "Retry";
 		button.Show();
