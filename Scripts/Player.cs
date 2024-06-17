@@ -43,6 +43,7 @@ public partial class Player : Area2D {
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta) {
+		if (Game.Paused) return;
 		// process player movement
 		ProcessInput();
 		Position += velocity * (float) delta;
@@ -68,6 +69,7 @@ public partial class Player : Area2D {
 
 	// SIGNAL HANDLERS SECTION
 	private void OnBodyEntered(Node2D body) {
+		if (Game.Paused) return;
 		if (body.GetClass() == "CharacterBody2D")  {
 			Projectile projectile = (Projectile) body;
 			// ignore if projectile is player projectile
@@ -80,6 +82,7 @@ public partial class Player : Area2D {
 
 		// check if player is dead
 		if (Health <= 0) {
+			sprite.Animation = "damaged";
 			EmitSignal(SignalName.PlayerDied);
 			return;
 		}
@@ -91,9 +94,8 @@ public partial class Player : Area2D {
 	// METHODS SECTION
 
 	public void InitializePlayer() {
-		Show();
 		Health = DefaultHealth;
-		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 2);
+		Position = new Vector2(x: ScreenSize.X / 2, y: ScreenSize.Y / 1.2f);
 		hitbox.Disabled = false;
 	}
 
